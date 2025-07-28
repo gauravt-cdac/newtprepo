@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Reviews for {{ cake.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 900px;">
+  <h2>Reviews for <strong>{{ cake.title }}</strong></h2>
+
+  <div class="mb-3">
+    <strong>Average Rating:</strong> {{ avg_rating }} / 5
+    <span>
+      {% for i in "12345" %}
+        {% if forloop.counter <= avg_rating|floatformat:0 %}
+          <span style="color: gold;">&#9733;</span>
+        {% else %}
+          <span style="color: #ccc;">&#9733;</span>
+        {% endif %}
+      {% endfor %}
+    </span>
+    <small>({{ total_reviews }} review{{ total_reviews|pluralize }})</small>
+  </div>
+
+  {% if reviews %}
+    <div class="list-group">
+      {% for review in reviews %}
+        <div class="list-group-item mb-3 shadow-sm rounded">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="mb-0">{{ review.title }}</h5>
+            <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+          </div>
+          <div class="mb-2">
+            {% for i in "12345" %}
+              {% if forloop.counter <= review.rating %}
+                <span style="color: gold;">&#9733;</span>
+              {% else %}
+                <span style="color: #ccc;">&#9733;</span>
+              {% endif %}
+            {% endfor %}
+          </div>
+          <p>{{ review.comment|linebreaksbr }}</p>
+          <small class="text-muted">by {{ review.user.get_full_name|default:review.user.username }}</small>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted fst-italic">No reviews yet for this cake.</p>
+  {% endif %}
+  
+  <a href="{% url 'cake_detail' cake.id %}" class="btn btn-outline-secondary mt-3">Back to Cake Details</a>
+
+</div>
+{% endblock %}

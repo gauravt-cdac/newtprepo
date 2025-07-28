@@ -2,72 +2,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Complete Your Payment - Cake Shop</title>
-
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Secure Payment | Cake Shop</title>
     {% bootstrap_css %}
     <style>
-        body {
-            background-color: #f8f9fa;
-        }
+      html, body {
+        background: #f6f6fa;
+        font-family: "Segoe UI", "Roboto", Arial, sans-serif;
+      }
+      .payment-card {
+        max-width: 460px;
+        margin: 60px auto 0 auto;
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 4px 18px 0 rgba(60,63,120,0.10), 0 1.5px 4px 0 rgba(0,0,0,0.06);
+        padding: 2.2rem 2.5rem 2rem 2.5rem;
+        text-align: center;
+        transition: box-shadow 0.2s;
+        border: 1px solid #f0f0f3;
+      }
+      .payment-card:hover {
+        box-shadow: 0 8px 32px rgba(60,63,120,0.14);
+      }
+      .payment-header {
+        font-weight: 700;
+        font-size: 2rem;
+        color: #23294d;
+        margin-bottom: 0.7rem;
+        letter-spacing: -.03em;
+      }
+      .payment-details {
+        font-size: 1.1rem;
+        color: #566278;
+        margin-bottom: 2.2rem;
+      }
+      .payment-amount {
+        font-weight: 700;
+        font-size: 2.4rem;
+        color: #222;
+        letter-spacing: -.02em;
+        margin-bottom: 2.1rem;
+      }
+      .payment-button {
+        display: block;
+        width: 100%;
+        background: linear-gradient(90deg,#3758e6 30%,#5977ff 100%);
+        color: #fff;
+        font-weight: 600;
+        font-size: 1.23rem;
+        border: none;
+        border-radius: 13px;
+        box-shadow: 0 3px 10px rgba(55,88,230,0.09);
+        padding: 1rem 0;
+        margin: 0.5rem 0 0 0;
+        transition: background 0.15s, box-shadow 0.15s;
+      }
+      .payment-button:hover,
+      .payment-button:focus {
+        background: linear-gradient(90deg,#2945b6 10%,#4461d5 90%);
+        color: #fff;
+        box-shadow: 0 5px 17px rgba(41,69,182,0.18);
+        outline: none;
+      }
+      .secure-info {
+        font-size: 0.93rem;
+        color: #bbb;
+        margin-top: 1.8rem;
+        letter-spacing: 0.01em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5em;
+      }
+      .secure-dot {
+        width: 8px;
+        height: 8px;
+        background: #17c784;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      @media (max-width: 576px) {
         .payment-card {
-            max-width: 480px;
-            margin: 50px auto;
-            box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
-            border-radius: 0.5rem;
-            background-color: white;
+          margin: 36px 8px 0 8px;
+          padding: 1.2rem 0.7rem 1rem 0.7rem;
         }
-        .payment-header {
-            background-color: #007bff;
-            color: white;
-            padding: 1.5rem;
-            border-top-left-radius: 0.5rem;
-            border-top-right-radius: 0.5rem;
-            text-align: center;
-        }
-        .payment-body {
-            padding: 2rem;
-            text-align: center;
-        }
-        .payment-body h3 {
-            margin-bottom: 1rem;
-        }
-        .payment-button {
-            width: 100%;
-            padding: 1rem;
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
+        .payment-header { font-size: 1.2rem; }
+        .payment-amount { font-size: 1.2rem; }
+      }
     </style>
-
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
-
 <div class="payment-card">
-    <div class="payment-header">
-        <h2>Complete Your Payment</h2>
-    </div>
-    <div class="payment-body">
-        <h3>Order #{{ order.order_number }}</h3>
-        <p><strong>Total Amount: ₹{{ order.total_amount }}</strong></p>
-        <button id="rzp-button" class="btn btn-primary payment-button">
-            Pay ₹{{ order.total_amount }}
-        </button>
+    <div class="payment-header">Complete Your Payment</div>
+    <div class="payment-details">Order #{{ order.order_number }}</div>
+    <div class="payment-amount">👇🏻 PAY NOW 👇🏻</div>
+    <button id="rzp-button" class="payment-button" type="button" aria-label="Pay ₹{{ order.total_amount }}">
+        Pay ₹{{ order.total_amount }}
+    </button>
+    <div class="secure-info">
+        <span class="secure-dot"></span>
+        100% Secure Gateway via Razorpay
     </div>
 </div>
 
 <script>
     const options = {
-        "key": "{{ razorpay_key_id }}", // Enter your Razorpay API Key
-        "amount": "{{ amount }}",       // Amount in paise, must be int
-        "currency": "INR",
-        "name": "Cake Shop",
-        "description": "Order #{{ order.order_number }}",
-        "order_id": "{{ razorpay_order_id }}", // Razorpay order ID returned from backend
-        "handler": function (response){
-            // Send payment response to backend for verification
+        key: "{{ razorpay_key_id }}",
+        amount: "{{ amount }}",
+        currency: "INR",
+        name: "Cake Shop",
+        description: "Order #{{ order.order_number }}",
+        order_id: "{{ razorpay_order_id }}",
+        handler: function(response) {
             fetch("{% url 'payment_success' %}", {
                 method: "POST",
                 headers: {
@@ -81,7 +129,7 @@
                 })
             }).then(res => res.json())
               .then(data => {
-                  if (data.status === "payment successful" || data.status === "Payment successful") {
+                  if (data.status && data.status.toLowerCase().includes("payment successful")) {
                       window.location.href = "{% url 'order_success' order.id %}";
                   } else {
                       alert("Payment verification failed. Please contact support.");
@@ -90,23 +138,19 @@
                   alert("Something went wrong. Please try again.");
               });
         },
-        "prefill": {
-            "name": "{{ order.user.get_full_name }}",
-            "email": "{{ order.user.email }}",
-            "contact": "{{ order.user.phone }}",
+        prefill: {
+            name: "{{ order.user.get_full_name }}",
+            email: "{{ order.user.email }}",
+            contact: "{{ order.user.phone }}",
         },
-        "theme": {
-            "color": "#007bff"
-        }
+        theme: { color: "#3758e6" }
     };
-
     const rzp = new Razorpay(options);
-    document.getElementById('rzp-button').addEventListener('click', function(e){
+    document.getElementById('rzp-button').addEventListener('click', function(e) {
         rzp.open();
         e.preventDefault();
     });
 </script>
-
 {% bootstrap_javascript %}
 </body>
 </html>

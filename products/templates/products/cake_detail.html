@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ cake.title }} - Cake Details{% endblock %}
 
@@ -8,26 +9,37 @@
     <!-- Images section -->
     <div class="col-md-6">
       <div class="image-gallery d-flex flex-column align-items-center">
+
         {% if cake.images.count > 0 %}
-          <div class="mb-3 w-100" style="height: 320px; overflow: hidden; border-radius: 0.5rem; box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);">
-            <img id="main-cake-image" src="{{ cake.images.first.image.url }}" alt="{{ cake.title }}" class="img-fluid w-100 h-100" 
-                 style="object-fit: contain;">
+          <div class="mb-3 mx-auto image-container" style="
+               max-width: 100%; 
+               border-radius: 16px; 
+               box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+               border: 1px solid rgba(0,0,0,0.1); 
+               background: #fff; 
+               display: flex; 
+               align-items: center; 
+               justify-content: center;">
+            <img id="main-cake-image" src="{{ cake.images.first.image.url }}" alt="{{ cake.title }}" 
+                 class="img-fluid rounded-img" style="object-fit: contain; max-height:320px; max-width:100%;">
           </div>
           {% if cake.images.count > 1 %}
             <div class="d-flex gap-2 overflow-auto" style="max-width: 100%;">
               {% for image in cake.images.all %}
                 <img src="{{ image.image.url }}" alt="Cake Image {{ forloop.counter }}" 
                      class="thumb-image rounded border {% if forloop.first %}border-primary{% else %}border-secondary{% endif %}" 
-                     style="width: 60px; height: 60px; object-fit: cover; cursor: pointer;"
-                     onclick="document.getElementById('main-cake-image').src=this.src; setActiveThumb(this);">
+                     style="width: 60px; height: 60px; object-fit: cover; cursor: pointer; border-radius: 8px;"
+                     data-index="{{ forloop.counter0 }}"
+                     onclick="selectImage({{ forloop.counter0 }}); pauseSlideshow();">
               {% endfor %}
             </div>
           {% endif %}
         {% else %}
-          <div class="w-100 h-100 d-flex justify-content-center align-items-center" style="height: 320px; background: #f0f0f0; border-radius: 0.5rem;">
+          <div class="w-100 h-100 d-flex justify-content-center align-items-center" style="height: 320px; background: #f0f0f0; border-radius: 16px;">
             <span class="text-muted">No images available</span>
           </div>
         {% endif %}
+
       </div>
     </div>
 
@@ -76,6 +88,7 @@
 </div>
 
 <script>
+  // Manage active thumb styling
   function setActiveThumb(selectedImg) {
     document.querySelectorAll('.thumb-image').forEach(img => {
       img.classList.remove('border-primary');
@@ -85,6 +98,57 @@
     selectedImg.classList.add('border-primary');
   }
 
+  // Select image by index from thumbnails
+  function selectImage(index) {
+    const images = document.querySelectorAll('.thumb-image');
+    if (images.length === 0) return;
+
+    let img = images[index];
+    if (!img) return;
+
+    let mainImage = document.getElementById('main-cake-image');
+    mainImage.src = img.src;
+    setActiveThumb(img);
+    currentIndex = index;  // Update current index for slideshow
+  }
+
+  // Automatic slideshow variables
+  let currentIndex = 0;
+  let slideshowInterval;
+  let isPaused = false;
+
+  function startSlideshow() {
+    const images = document.querySelectorAll('.thumb-image');
+    if (images.length <= 1) return; // No slideshow if <=1 image
+
+    slideshowInterval = setInterval(() => {
+      if (isPaused) return;
+
+      currentIndex = (currentIndex + 1) % images.length;
+      selectImage(currentIndex);
+    }, 2000);  // 2 seconds interval
+  }
+
+  function pauseSlideshow() {
+    isPaused = true;
+  }
+
+  function resumeSlideshow() {
+    isPaused = false;
+  }
+
+  // Pause slideshow on mouse enter on thumb container and resume on leave
+  document.querySelectorAll('.thumb-image').forEach(img => {
+    img.addEventListener('mouseenter', pauseSlideshow);
+    img.addEventListener('mouseleave', resumeSlideshow);
+  });
+
+  // Start slideshow after DOM load
+  document.addEventListener('DOMContentLoaded', () => {
+    startSlideshow();
+  });
+
+  // Add-to-cart handler
   document.getElementById('add-to-cart-btn')?.addEventListener('click', function () {
     const selectedVariant = document.querySelector('input[name="variant"]:checked');
     if (!selectedVariant) {
@@ -112,10 +176,15 @@
     .catch(() => showToast('An error occurred.', 'error'));
   });
 
+  // Toast notification at top center
   function showToast(message, type) {
     const toast = document.createElement('div');
-    toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0 position-fixed bottom-0 end-0 m-3`;
-    toast.style.zIndex = 1080;
+    toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0 position-fixed start-50 translate-middle-x mt-3`;
+    toast.style.top = "20px";
+    toast.style.left = "50%";
+    toast.style.right = "auto";
+    toast.style.marginRight = "0";
+    toast.style.width = "auto";
     toast.setAttribute('role', 'alert');
     toast.setAttribute('aria-live', 'assertive');
     toast.setAttribute('aria-atomic', 'true');
@@ -144,6 +213,7 @@
   .thumb-image {
     border: 2px solid #ddd;
     transition: border-color 0.3s ease;
+    border-radius: 8px; /* Rounded corners */
   }
   .thumb-image.border-primary {
     border-color: #198754 !important;
@@ -151,6 +221,13 @@
   .thumb-image:hover {
     border-color: #198754;
     cursor: pointer;
+  }
+  .image-container img.rounded-img {
+    border-radius: 16px; /* More rounded corners on main image */
+    transition: transform 0.3s ease;
+  }
+  .image-container img.rounded-img:hover {
+    transform: scale(1.02);
   }
 </style>
 {% endblock %}
