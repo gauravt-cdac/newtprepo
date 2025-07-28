@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Checkout</h2>
+    {% if cart and cart.items.all %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Cake</th>
+                    <th>Variant</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in cart.items.all %}
+                <tr>
+                    <td>{{ item.variant.cake.title }}</td>
+                    <td>{{ item.variant.weight }}kg</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₹{{ item.get_total_price }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <p><strong>Total: ₹{{ cart.get_total_price }}</strong></p>
+        <form method="post">
+            {% csrf_token %}
+            <div>
+                <label for="address_id">Select Address:</label>
+                <select name="address_id" required>
+                {% for address in addresses %}
+                    <option value="{{ address.id }}">{{ address.address_line_1 }}, {{ address.city }}, {{ address.state }}, {{ address.pincode }}</option>
+                {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="payment_method">Payment:</label>
+                <select name="payment_method" required>
+                    <option value="razorpay">Online Payment</option>
+                    <option value="cod">Cash On Delivery</option>
+                </select>
+            </div>
+            <div>
+                <label for="coupon_code">Coupon Code (optional):</label>
+                <input type="text" name="coupon_code">
+            </div>
+            <button class="btn btn-success mt-2">Place Order</button>
+        </form>
+    {% else %}
+        <div class="alert alert-warning">Your cart is empty. <a href="{% url 'cake_list' %}">Browse cakes</a></div>
+    {% endif %}
+</div>
+{% endblock %}

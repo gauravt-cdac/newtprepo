@@ -1,0 +1,208 @@
+{% load bootstrap5 %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Cake Shop{% endblock %}</title>
+
+    {% bootstrap_css %}
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+                <i class="fas fa-birthday-cake me-2"></i> Cake Shop
+            </a>
+            <button 
+                class="navbar-toggler" 
+                type="button" 
+                data-bs-toggle="collapse" 
+                data-bs-target="#navbarNav" 
+                aria-controls="navbarNav" 
+                aria-expanded="false" 
+                aria-label="Toggle navigation"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cake_list' %}">Cakes</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a
+                            class="nav-link dropdown-toggle" 
+                            href="#" 
+                            id="categoriesDropdown" 
+                            role="button" 
+                            data-bs-toggle="dropdown" 
+                            aria-expanded="false"
+                        >
+                            Categories
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
+                            {% for category in categories %}
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'cake_list' %}?category={{ category.id }}">
+                                        {{ category.name }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+
+                <form class="d-flex me-lg-3 my-2 my-lg-0" method="GET" action="{% url 'cake_list' %}" role="search">
+                    <input
+                        class="form-control me-2"
+                        type="search"
+                        name="search"
+                        placeholder="Search cakes..."
+                        aria-label="Search cakes"
+                        value="{{ request.GET.search }}"
+                    />
+                    <button class="btn btn-outline-light" type="submit" aria-label="Search">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+
+                <ul class="navbar-nav mb-2 mb-lg-0">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item position-relative">
+                            <a class="nav-link" href="{% url 'cart_detail' %}" aria-label="View Cart">
+                                <i class="fas fa-shopping-cart fa-lg"></i>
+                                <span
+                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                    id="cart-count"
+                                    style="font-size: 0.75rem;"
+                                >
+                                    {% if user.cart.get_total_items %}{{ user.cart.get_total_items }}{% else %}0{% endif %}
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a
+                                class="nav-link dropdown-toggle d-flex align-items-center"
+                                href="#"
+                                role="button"
+                                id="userDropdown"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                            >
+                                <i class="fas fa-user me-1"></i> {{ user.get_full_name|default:user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                {% if user.role == 'admin' %}
+                                    <li><a class="dropdown-item" href="{% url 'admin_dashboard' %}">Admin Dashboard</a></li>
+                                {% elif user.role == 'seller' %}
+                                    <li><a class="dropdown-item" href="{% url 'seller_dashboard' %}">Seller Dashboard</a></li>
+                                {% endif %}
+                                <li><a class="dropdown-item" href="{% url 'profile' %}">My Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'order_list' %}">My Orders</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <main class="container my-4" role="main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <h5>Cake Shop</h5>
+                    <p class="mb-0">Delicious cakes for every occasion!</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h5>Contact Us</h5>
+                    <p class="mb-0">Email: support@cakeshop.com</p>
+                    <p>Phone: +91 9876543210</p>
+                </div>
+            </div>
+            <hr class="border-light" />
+            <div class="text-center small">
+                &copy; 2024 Cake Shop. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    {% bootstrap_javascript %}
+
+    <script>
+        function addToCart(variantId, quantity = 1) {
+            fetch("{% url 'add_to_cart' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: `variant_id=${variantId}&quantity=${quantity}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('cart-count').textContent = data.cart_count;
+                    showToast(data.message, 'success');
+                } else {
+                    showToast(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                showToast('Something went wrong!', 'error');
+            });
+        }
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0 position-fixed bottom-0 end-0 m-3`;
+            toast.style.zIndex = 1080;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast, { delay: 4000 });
+            bsToast.show();
+            toast.addEventListener('hidden.bs.toast', () => {
+                document.body.removeChild(toast);
+            });
+        }
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

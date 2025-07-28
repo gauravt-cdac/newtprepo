@@ -1,0 +1,49 @@
+<!-- products/templates/products/cake_list.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Cake List{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Cakes List</h2>
+  {% if page_obj %}
+    <div class="row">
+      {% for cake in page_obj %}
+        <div class="col-md-4 mb-4">
+          <div class="card cake-card">
+            {% if cake.get_main_image %}
+              <img src="{{ cake.get_main_image.image.url }}" class="card-img-top" alt="{{ cake.title }}">
+            {% else %}
+              <img src="{% static 'images/no_image.jpg' %}" class="card-img-top" alt="No Image">
+            {% endif %}
+            <div class="card-body">
+              <h5 class="card-title">{{ cake.title }}</h5>
+              <p>{{ cake.description|truncatechars:80 }}</p>
+              <a href="{% url 'cake_detail' cake.id %}" class="btn btn-sm btn-primary">View Details</a>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <p>No cakes found.</p>
+      {% endfor %}
+    </div>
+    <!-- Pagination -->
+    <nav>
+      <ul class="pagination">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+          </li>
+        {% endif %}
+        <li class="page-item active">
+          <span class="page-link">{{ page_obj.number }}</span>
+        </li>
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
+</div>
+{% endblock %}

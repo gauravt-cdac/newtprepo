@@ -1,0 +1,59 @@
+<!-- templates/emails/order_confirmation.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Order Confirmation</title>
+    <style>
+        .container { max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; }
+        .header { background-color: #3498db; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; }
+        .order-details { background-color: #f8f9fa; padding: 15px; margin: 15px 0; }
+        .footer { background-color: #ecf0f1; padding: 15px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Order Confirmation</h1>
+        </div>
+        
+        <div class="content">
+            <p>Dear {{ user.get_full_name }},</p>
+            
+            <p>Thank you for your order! Your order has been successfully placed.</p>
+            
+            <div class="order-details">
+                <h3>Order Details:</h3>
+                <p><strong>Order Number:</strong> {{ order.order_number }}</p>
+                <p><strong>Order Date:</strong> {{ order.created_at|date:"F d, Y" }}</p>
+                <p><strong>Total Amount:</strong> ₹{{ order.total_amount }}</p>
+                <p><strong>Payment Method:</strong> {{ order.get_payment_method_display }}</p>
+            </div>
+            
+            <h3>Items Ordered:</h3>
+            <ul>
+                {% for item in order.items.all %}
+                <li>{{ item.variant.cake.title }} ({{ item.variant.weight }}kg) × {{ item.quantity }} - ₹{{ item.get_total_price }}</li>
+                {% endfor %}
+            </ul>
+            
+            <p>Your order will be delivered to:</p>
+            <div class="order-details">
+                {{ order.shipping_address.name }}<br>
+                {{ order.shipping_address.address_line_1 }}<br>
+                {% if order.shipping_address.address_line_2 %}{{ order.shipping_address.address_line_2 }}<br>{% endif %}
+                {{ order.shipping_address.city }}, {{ order.shipping_address.state }} - {{ order.shipping_address.pincode }}<br>
+                Phone: {{ order.shipping_address.phone }}
+            </div>
+            
+            <p>We will keep you updated about your order status via email.</p>
+        </div>
+        
+        <div class="footer">
+            <p>Thank you for choosing Cake Shop!</p>
+            <p>For any queries, contact us at support@cakeshop.com</p>
+        </div>
+    </div>
+</body>
+</html>

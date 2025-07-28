@@ -1,0 +1,27 @@
+/* static/css/custom.css */
+.cake-card {
+    transition: transform 0.3s;
+}
+
+.cake-card:hover {
+    transform: translateY(-5px);
+}
+
+.rating-stars {
+    color: #ffc107;
+}
+
+.price-tag {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #28a745;
+}
+
+.cart-count {
+    font-size: 0.8em;
+}
+
+.todays-special {
+    border: 2px solid #ffc107;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+}

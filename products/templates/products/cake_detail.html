@@ -1,0 +1,17 @@
+<!-- products/templates/products/cake_detail.html -->
+{% extends "base.html" %}
+{% block content %}
+  <h1>{{ cake.title }}</h1>
+  <p>{{ cake.description }}</p>
+  <p>Category: {{ cake.category.name }}</p>
+  <p>Price(s): 
+    {% for variant in variants %}
+      <span>{{ variant.weight }}kg - ₹{{ variant.price }}</span>
+    {% endfor %}
+  </p>
+  <div>
+    {% for image in cake.images.all %}
+      <img src="{{ image.image.url }}" alt="Cake Image" style="max-width:150px;">
+    {% endfor %}
+  </div>
+{% endblock %}

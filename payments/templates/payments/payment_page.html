@@ -1,0 +1,79 @@
+<!-- payments/templates/payments/payment_page.html -->
+{% load bootstrap5 %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment - Cake Shop</title>
+    {% bootstrap_css %}
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Complete Your Payment</h4>
+                    </div>
+                    <div class="card-body">
+                        <h5>Order #{{ order.order_number }}</h5>
+                        <p><strong>Total Amount: ₹{{ order.total_amount }}</strong></p>
+                        <button id="rzp-button" class="btn btn-primary btn-lg btn-block">
+                            Pay ₹{{ order.total_amount }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var options = {
+            "key": "{{ razorpay_key_id }}",
+            "amount": "{{ amount }}",
+            "currency": "INR",
+            "name": "Cake Shop",
+            "description": "Order #{{ order.order_number }}",
+            "order_id": "{{ razorpay_order_id }}",
+            "handler": function (response) {
+                // Send payment details to server for verification
+                fetch("{% url 'payment_success' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        'razorpay_payment_id': response.razorpay_payment_id,
+                        'razorpay_order_id': response.razorpay_order_id,
+                        'razorpay_signature': response.razorpay_signature,
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'Payment successful') {
+                        window.location.href = "{% url 'order_success' order.id %}";
+                    } else {
+                        alert('Payment verification failed');
+                    }
+                });
+            },
+            "prefill": {
+                "name": "{{ order.user.get_full_name }}",
+                "email": "{{ order.user.email }}",
+                "contact": "{{ order.user.phone }}"
+            },
+            "theme": {
+                "color": "#3399cc"
+            }
+        };
+        
+        var rzp = new Razorpay(options);
+        
+        document.getElementById('rzp-button').onclick = function(e) {
+            rzp.open();
+            e.preventDefault();
+        }
+    </script>
+    {% bootstrap_javascript %}
+</body>
+</html>
