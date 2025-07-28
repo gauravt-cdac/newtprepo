@@ -44,7 +44,7 @@ def cake_list(request):
         cakes = cakes.filter(id__in=cake_ids)
     
     # Pagination
-    paginator = Paginator(cakes, 12)  # 12 cakes per page
+    paginator = Paginator(cakes, 6)  # 12 cakes per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     

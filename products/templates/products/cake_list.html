@@ -1,49 +1,87 @@
-<!-- products/templates/products/cake_list.html -->
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Cake List{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-  <h2>Cakes List</h2>
+<div class="container mt-4" style="max-width: 1140px;">
+  <h2 class="mb-4" style="color: #222;">Cakes List</h2>
+
   {% if page_obj %}
-    <div class="row">
+    <div class="row g-4">
       {% for cake in page_obj %}
-        <div class="col-md-4 mb-4">
-          <div class="card cake-card">
-            {% if cake.get_main_image %}
-              <img src="{{ cake.get_main_image.image.url }}" class="card-img-top" alt="{{ cake.title }}">
+      <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
+        <div class="card w-100 shadow-sm border rounded-3" style="border-color: #ddd; background-color: #fff;">
+          <div style="height: 250px; overflow: hidden; background-color: #fefefe; border-bottom: 1px solid #ddd; display:flex; align-items:center; justify-content:center;">
+            {% if cake.get_main_image and cake.get_main_image.image %}
+              <img src="{{ cake.get_main_image.image.url }}" alt="{{ cake.title }}" 
+                   style="max-height: 250px; max-width: 100%; object-fit: contain; object-position: center;">
             {% else %}
-              <img src="{% static 'images/no_image.jpg' %}" class="card-img-top" alt="No Image">
+              <img src="{% static 'images/no_image.jpg' %}" alt="No Image" 
+                   style="max-height: 250px; max-width: 100%; object-fit: contain; object-position: center;">
             {% endif %}
-            <div class="card-body">
-              <h5 class="card-title">{{ cake.title }}</h5>
-              <p>{{ cake.description|truncatechars:80 }}</p>
-              <a href="{% url 'cake_detail' cake.id %}" class="btn btn-sm btn-primary">View Details</a>
+          </div>
+          <div class="card-body d-flex flex-column p-3">
+            <h5 class="card-title fw-semibold" style="color: #222;">{{ cake.title }}</h5>
+            <p class="card-text text-truncate" style="max-height: 3.6em; color: #444;">{{ cake.description }}</p>
+            <div class="mt-auto d-flex justify-content-between align-items-center pt-2">
+              <a href="{% url 'cake_detail' cake.id %}" class="btn btn-outline-primary btn-sm px-3" style="font-weight: 600;">
+                View Details
+              </a>
+
+              {% if user.is_authenticated %}
+                {% if user.role == 'buyer' and cake.variants.first %}
+                  <button type="button" onclick="addToCart({{ cake.variants.first.id }}, 1)" 
+                          class="btn btn-success btn-sm px-3" style="font-weight: 600;">
+                    Add to Cart
+                  </button>
+                {% else %}
+                  <small class="text-muted fst-italic" title="Add to cart available for buyers only" style="color: #666;">
+                    No purchase option
+                  </small>
+                {% endif %}
+              {% else %}
+                <a href="{% url 'login' %}" class="btn btn-warning btn-sm px-3" style="font-weight: 600;">
+                  Login to Buy
+                </a>
+              {% endif %}
             </div>
           </div>
         </div>
-      {% empty %}
-        <p>No cakes found.</p>
+      </div>
       {% endfor %}
     </div>
+
     <!-- Pagination -->
-    <nav>
-      <ul class="pagination">
+    <nav class="mt-4" aria-label="Page navigation">
+      <ul class="pagination justify-content-center">
         {% if page_obj.has_previous %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo; Previous</a>
           </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">&laquo; Previous</span></li>
         {% endif %}
-        <li class="page-item active">
-          <span class="page-link">{{ page_obj.number }}</span>
-        </li>
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if num == page_obj.number %}
+            <li class="page-item active" aria-current="page"><span class="page-link">{{ num }}</span></li>
+          {% elif num > page_obj.number|add:-3 and num < page_obj.number|add:3 %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+          {% endif %}
+        {% endfor %}
+
         {% if page_obj.has_next %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next &raquo;</a>
           </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">Next &raquo;</span></li>
         {% endif %}
       </ul>
     </nav>
+
+  {% else %}
+    <p class="text-muted fst-italic" style="color: #666;">No cakes available.</p>
   {% endif %}
 </div>
 {% endblock %}

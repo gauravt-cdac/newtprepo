@@ -3,14 +3,36 @@
 {% block title %}Order Success{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Thank You for Your Order!</h2>
-    <p>Your order <strong>{{ order.order_number }}</strong> has been placed successfully.</p>
+<div class="container mt-5 mb-5" style="max-width: 720px;">
+    <div class="text-center p-4 bg-light rounded shadow-sm">
+        <div class="mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" 
+                 width="64" height="64" fill="#28a745" 
+                 class="bi bi-check-circle" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.97 11.03a.75.75 0 0 
+                0 1.07 0L11.03 8.07a.75.75 0 1 0-1.06-1.06L7.5 9.44 6.47 8.41a.75.75 0 
+                0 0-1.06 1.06l1.56 1.56z"/>
+            </svg>
+        </div>
 
-    <p><strong>Total Amount Paid:</strong> ₹{{ order.total_amount }}</p>
-    
-    <p>You can view your order details <a href="{% url 'order_detail' order.id %}">here</a>.</p>
+        <h2 class="mb-3" style="color: #222;">Thank You for Your Order!</h2>
 
-    <a href="{% url 'cake_list' %}" class="btn btn-primary mt-3">Continue Shopping</a>
+        <p class="fs-5">
+            Your order <strong>{{ order.order_number }}</strong> has been placed successfully.
+        </p>
+
+        <p class="fs-6 text-muted">
+            <strong>Total Amount Paid:</strong> ₹{{ order.total_amount }}
+        </p>
+
+        <p class="mb-4 fs-6 text-muted">
+            You can view your order details anytime 
+            <a href="{% url 'order_detail' order.id %}" class="text-decoration-none">here</a>.
+        </p>
+
+        <a href="{% url 'cake_list' %}" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
+            Continue Shopping
+        </a>
+    </div>
 </div>
 {% endblock %}

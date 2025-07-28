@@ -255,3 +255,42 @@ def cancel_order(request, order_id):
         return redirect('order_list')
 
     return render(request, 'orders/cancel_order.html', {'order': order})
+
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, render
+from django.contrib import messages
+from accounts.models import Address
+
+@login_required
+def add_address_checkout(request):
+    if request.method == "POST":
+        user = request.user
+        name = request.POST.get("name", "").strip()
+        phone = request.POST.get("phone", "").strip()
+        address_line_1 = request.POST.get("address_line_1", "").strip()
+        address_line_2 = request.POST.get("address_line_2", "").strip()
+        city = request.POST.get("city", "").strip()
+        state = request.POST.get("state", "").strip()
+        pincode = request.POST.get("pincode", "").strip()
+
+        if not (name and phone and address_line_1 and city and state and pincode):
+            messages.error(request, "Please fill all the required address fields.")
+            return redirect("checkout")
+
+        # Create and save new address for user
+        Address.objects.create(
+            user=user,
+            name=name,
+            phone=phone,
+            address_line_1=address_line_1,
+            address_line_2=address_line_2,
+            city=city,
+            state=state,
+            pincode=pincode
+        )
+        messages.success(request, "Address added successfully! Please select it from the list.")
+        return redirect("checkout")  # Redirect back to checkout page
+
+    # If GET, redirect back to checkout or show error
+    return redirect("checkout")

@@ -3,40 +3,167 @@
 {% block title %}Welcome to Cake Shop{% endblock %}
 
 {% block content %}
-<h1>Welcome to Cake Shop</h1>
-
-<h2>Today's Special Cakes</h2>
-<div class="row">
-  {% for cake in todays_special_cakes %}
-  <div class="col-md-3">
-    <div class="card">
-      <img src="{{ cake.get_main_image.image.url }}" class="card-img-top" alt="{{ cake.title }}">
-      <div class="card-body">
-        <h5 class="card-title">{{ cake.title }}</h5>
-        <p class="card-text">{{ cake.description|truncatewords:15 }}</p>
-        <a href="{% url 'cake_detail' cake.id %}" class="btn btn-primary">View Details</a>
-      </div>
-    </div>
-  </div>
-  {% empty %}
-  <p>No special cakes available right now.</p>
-  {% endfor %}
+<div class="text-center mt-5 mb-5">
+    <h1 class="display-4 fw-bold" style="color: #222;">Welcome to Cake Shop</h1>
+    <p class="lead text-secondary mx-auto" style="max-width: 520px; color: #444;">
+        Delight in handcrafted cakes for every celebration — fresh, elegant, and made to cherish every moment.
+    </p>
+    <a href="{% url 'cake_list' %}" 
+       class="btn btn-gold btn-lg mt-3 px-5 rounded-pill shadow-sm"
+       style="font-weight: 600; border-radius: 50px; transition: background-color 0.3s ease, box-shadow 0.3s ease;">
+        Browse Our Cakes
+    </a>
 </div>
 
-<h2>Latest Cakes</h2>
-<div class="row">
-  {% for cake in latest_cakes %}
-  <div class="col-md-3">
-    <div class="card">
-      <img src="{{ cake.get_main_image.image.url }}" class="card-img-top" alt="{{ cake.title }}">
-      <div class="card-body">
-        <h5 class="card-title">{{ cake.title }}</h5>
-        <p class="card-text">{{ cake.description|truncatewords:15 }}</p>
-        <a href="{% url 'cake_detail' cake.id %}" class="btn btn-primary">View Details</a>
-      </div>
-    </div>
-  </div>
-  {% endfor %}
-</div>
+<section class="container my-5" style="max-width: 1140px;">
+    <h2 class="mb-4 fw-semibold text-center" style="color: #333333;">Explore Popular Categories</h2>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 justify-content-center">
+        <!-- Birthday Cakes -->
+        <div class="col">
+            <a href="{% url 'cake_list' %}?category=1" class="text-decoration-none category-card" style="color: #333;">
+                <div class="card border rounded-3 shadow-sm h-100 hover-scale" 
+                     style="transition: transform 0.3s ease, box-shadow 0.3s ease; border-color: #bbb; background-color: #fef8f0;">
+                    <div class="card-body text-center p-4 d-flex flex-column justify-content-center">
+                        <div class="icon-bg mb-3 mx-auto">
+                            <i class="fas fa-birthday-cake fa-3x" style="color: #C4962F;"></i>
+                        </div>
+                        <h5 class="card-title" style="font-weight: 700;">Birthday Cakes</h5>
+                        <p class="text-muted small" style="color: #555;">Celebrate with joy and flavors crafted just for you.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
 
+        <!-- Party Cakes -->
+        <div class="col">
+            <a href="{% url 'cake_list' %}?category=2" class="text-decoration-none category-card" style="color: #333;">
+                <div class="card border rounded-3 shadow-sm h-100 hover-scale" 
+                     style="transition: transform 0.3s ease, box-shadow 0.3s ease; border-color: #bbb; background-color: #fef8f0;">
+                    <div class="card-body text-center p-4 d-flex flex-column justify-content-center">
+                        <div class="icon-bg mb-3 mx-auto">
+                            <i class="fas fa-glass-cheers fa-3x" style="color: #C4962F;"></i>
+                        </div>
+                        <h5 class="card-title" style="font-weight: 700;">Party Cakes</h5>
+                        <p class="text-muted small" style="color: #555;">Make every party unforgettable with our delicious cakes.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Anniversary Cakes -->
+        <div class="col">
+            <a href="{% url 'cake_list' %}?category=3" class="text-decoration-none category-card" style="color: #333;">
+                <div class="card border rounded-3 shadow-sm h-100 hover-scale" 
+                     style="transition: transform 0.3s ease, box-shadow 0.3s ease; border-color: #bbb; background-color: #fef8f0;">
+                    <div class="card-body text-center p-4 d-flex flex-column justify-content-center">
+                        <div class="icon-bg mb-3 mx-auto">
+                            <i class="fas fa-heart fa-3x" style="color: #C4962F;"></i>
+                        </div>
+                        <h5 class="card-title" style="font-weight: 700;">Anniversary Cakes</h5>
+                        <p class="text-muted small" style="color: #555;">Sweeten your special moments with elegant cakes.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'cake_list' %}" 
+           class="btn btn-outline-dark rounded-pill px-4 py-2 shadow-sm"
+           style="font-weight: 600; transition: background-color 0.3s ease;">
+            Explore More Cakes & Categories
+        </a>
+    </div>
+</section>
+
+{% if todays_special_cakes %}
+<section class="container my-5" style="max-width: 1140px;">
+    <h2 class="mb-4 fw-semibold text-center" style="color: #333;">Today's Special Cakes</h2>
+    <div class="row g-4">
+        {% for cake in todays_special_cakes %}
+        <div class="col-lg-3 col-md-4 col-sm-6 d-flex align-items-stretch">
+            <div class="card w-100 shadow-sm border rounded-3" style="border-color: #bbb; background-color: #fff9e6;">
+                <div style="height: 220px; overflow: hidden; border-bottom: 1px solid #ddd; display: flex; align-items: center; justify-content: center;">
+                    <img src="{{ cake.get_main_image.image.url }}" alt="{{ cake.title }}" 
+                        style="max-height: 220px; max-width: 100%; object-fit: contain;">
+                </div>
+                <div class="card-body d-flex flex-column p-3">
+                    <h5 class="card-title fw-semibold" style="color: #222;">{{ cake.title }}</h5>
+                    <p class="card-text text-truncate" style="max-height: 3.6em; color: #444;">{{ cake.description }}</p>
+                    <div class="mt-auto d-flex justify-content-between align-items-center pt-2">
+                        <a href="{% url 'cake_detail' cake.id %}" class="btn btn-outline-gold btn-sm px-3" 
+                           style="font-weight: 600;">
+                            View Details
+                        </a>
+                        {% if user.is_authenticated and user.role == 'buyer' and cake.variants.first %}
+                        <button type="button" onclick="addToCart({{ cake.variants.first.id }}, 1)" 
+                                class="btn btn-gold btn-sm px-3" style="font-weight: 600; transition: background-color 0.3s ease;">
+                            Add to Cart
+                        </button>
+                        {% elif not user.is_authenticated %}
+                        <a href="{% url 'login' %}" class="btn btn-warning btn-sm px-3" style="font-weight: 600;">
+                            Login to Buy
+                        </a>
+                        {% else %}
+                        <small class="text-muted fst-italic" title="Add to cart available for buyers only" style="color: #666;">
+                            Purchase not available
+                        </small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<section class="text-center py-5" style="background-color: #f9f7f0;">
+    <div class="container" style="max-width: 700px;">
+        <p class="lead text-secondary fst-italic mb-0" style="color: #555;">
+            At Cake Shop, every cake is a piece of art — crafted with the finest ingredients & delivered with care.
+        </p>
+    </div>
+</section>
+
+<style>
+.hover-scale:hover, .hover-scale:focus {
+    transform: scale(1.05);
+    box-shadow: 0 12px 24px rgba(196, 150, 47, 0.3);
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.btn-gold {
+    background-color: #052e33ff;
+    color: #fff;
+}
+.btn-gold:hover, .btn-gold:focus {
+    background-color:  #9f8527;
+    color: #fff;
+}
+.btn-outline-gold {
+    border-color: #030303ff;
+    color: #9f8527;
+    background: transparent;
+}
+.btn-outline-gold:hover, .btn-outline-gold:focus {
+    background-color: #504847ff;
+    color: #fff;
+    border-color: #eeb232ff;
+}
+.category-card .icon-bg {
+    width: 103px;
+    height: 77px;
+    border-radius: 50%;
+    background: rgba(95, 75, 75, 0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 10px auto;
+}
+.category-card:hover, .category-card:focus {
+    text-decoration: none;
+    color: #000000ff !important;
+}
+</style>
 {% endblock %}

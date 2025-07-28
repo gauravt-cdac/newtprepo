@@ -1,35 +1,52 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h2>Order Details - {{ order.order_number }}</h2>
-<p>Status: {{ order.get_status_display }}</p>
-<p>Order Date: {{ order.created_at|date:"d M Y" }}</p>
-<p>Total Amount: ₹{{ order.total_amount }}</p>
+<div class="container mt-4" style="max-width: 720px;">
+  <h2 class="mb-3">Order Details - {{ order.order_number }}</h2>
 
-<h3>Items:</h3>
-<ul>
-  {% for item in order.items.all %}
-    <li>{{ item.variant.cake.title }} ({{ item.variant.weight }}kg) × {{ item.quantity }} - ₹{{ item.get_total_price }}</li>
-  {% endfor %}
-</ul>
-
-<!-- Invoice PDF download -->
-{% if order.is_paid %}
-  <a href="{% url 'download_invoice' order.id %}" class="btn btn-primary">Download Invoice (PDF)</a>
-{% endif %}
-
-<!-- Cancel Order -->
-{% if order.can_be_cancelled %}
-  <hr>
-  <h4>Cancel Order</h4>
-  <form method="post">
-    {% csrf_token %}
-    <div class="mb-3">
-      <label for="cancel_reason" class="form-label">Reason for cancellation:</label>
-      <textarea name="cancel_reason" id="cancel_reason" rows="3" required class="form-control"></textarea>
+  {% if order.status == 'cancelled' %}
+    <div class="alert alert-danger fs-5 text-center" role="alert">
+      <strong>ORDER CANCELLED</strong>
     </div>
-    <button type="submit" name="action" value="cancel_order" class="btn btn-danger">Cancel Order</button>
-  </form>
-{% else %}
-  <p>Order cannot be cancelled at this stage.</p>
-{% endif %}
+  {% else %}
+    <p><strong>Status:</strong> {{ order.get_status_display }}</p>
+    <p><strong>Order Date:</strong> {{ order.created_at|date:"d M Y" }}</p>
+    <p><strong>Total Amount:</strong> ₹{{ order.total_amount|floatformat:2 }}</p>
+
+    <hr>
+
+    <h4>Items:</h4>
+    <ul class="list-group mb-4">
+      {% for item in order.items.all %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            {{ item.variant.cake.title }} ({{ item.variant.weight }} kg) × {{ item.quantity }}
+          </div>
+          <span>₹{{ item.get_total_price|floatformat:2 }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+
+    {% if order.is_paid %}
+      <a href="{% url 'download_invoice' order.id %}" class="btn btn-primary mb-4">
+        <i class="fas fa-file-pdf me-2"></i> Download Invoice (PDF)
+      </a>
+    {% endif %}
+
+    {% if order.can_be_cancelled %}
+      <hr>
+      <h4 class="mb-3">Cancel Order</h4>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="cancel_reason" class="form-label">Reason for cancellation:</label>
+          <textarea name="cancel_reason" id="cancel_reason" rows="3" required class="form-control" placeholder="Please provide a reason"></textarea>
+        </div>
+        <button type="submit" name="action" value="cancel_order" class="btn btn-danger">
+          <i class="fas fa-times-circle me-1"></i> Cancel Order
+        </button>
+      </form>
+    {% endif %}
+  {% endif %}
+</div>
 {% endblock %}

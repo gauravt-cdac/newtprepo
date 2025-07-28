@@ -1,30 +1,44 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h2>My Orders</h2>
+<h2 class="mb-4">My Orders</h2>
+
 {% if orders %}
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Order Number</th>
-        <th>Date</th>
-        <th>Status</th>
-        <th>Total Amount</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for order in orders %}
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead>
         <tr>
-          <td>{{ order.order_number }}</td>
-          <td>{{ order.created_at|date:"d M Y" }}</td>
-          <td>{{ order.get_status_display }}</td>
-          <td>₹{{ order.total_amount }}</td>
-          <td><a href="{% url 'order_detail' order.id %}">View Details</a></td>
+          <th scope="col">Order Number</th>
+          <th scope="col">Date</th>
+          <th scope="col">Status</th>
+          <th scope="col">Total Amount</th>
+          <th scope="col" class="text-center">Actions</th>
         </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+          <tr {% if order.status == 'cancelled' %}class="table-danger fst-italic"{% endif %}>
+            <td>{{ order.order_number }}</td>
+            <td>{{ order.created_at|date:"d M Y" }}</td>
+            <td>
+              {% if order.status == 'cancelled' %}
+                <span class="badge bg-danger">Cancelled</span>
+              {% else %}
+                {{ order.get_status_display }}
+              {% endif %}
+            </td>
+            <td>₹{{ order.total_amount|floatformat:2 }}</td>
+            <td class="text-center">
+              <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-primary">
+                View Details
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 {% else %}
-  <p>You have no orders yet.</p>
+  <p class="text-muted fst-italic">You have no orders yet.</p>
 {% endif %}
 {% endblock %}
